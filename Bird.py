@@ -7,6 +7,9 @@ class Bird:
         self.velocity = 0
         self.lift = -25
         self.score = 0
+        self.closest_pipe_distance = []
+        self.horizontal_distance = 0
+        self.vertical_distance = 0
 
     def position(self):
         return [self.x, self.y]
@@ -24,18 +27,23 @@ class Bird:
             self.y = 0
             self.velocity = 0
 
+        self.horizontal_distance = self.distance((self.x, self.y), (self.closest_pipe_distance[0], self.y))
+        self.vertical_distance = self.distance((self.x, 0), (self.x, self.y))
+
     def show(self):
         from FlappyBird import pygame, screen, white
         pygame.draw.circle(screen, white, self.position(), 15)
+        pygame.draw.line(screen, (0, 255, 0), (self.x, 0), (self.x, self.y))
+        pygame.draw.line(screen, (0, 255, 0),
+                         (self.x, self.y), (self.closest_pipe_distance[0], self.y))
+        screen.blit(
+            pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+                "{},{}".format(self.vertical_distance, self.horizontal_distance), True, (0, 255, 0)),
+            (self.x+50, self.y-50))
 
     def up(self):
         self.velocity += self.lift
 
-        # def hit(self, pipe):
-        #     from FlappyBird import height
-        #     if self.y < pipe.top or self.y > height - pipe.bottom:
-        #         if pipe.x < self.x < pipe.x + pipe.w:
-        #             pipe.has_hit = True
-        #             return True
-        #     pipe.has_hit = False
-        #     return False
+    def distance(self, p1, p2):
+        import math
+        return math.pow((math.pow(p1[0] - p2[0], 2) + math.pow(p1[1] - p2[1], 2)), 0.5)
