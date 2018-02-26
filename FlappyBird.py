@@ -80,15 +80,4 @@ def game():
 
 
 game()
-
-
-def lol():
-    birds = [Bird(123, 321), Bird(105, 100), Bird(120, 130), Bird(1010, 100), Bird(100, 150)]
-    # minx = min(,
-    #            lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
-    birdf = min([bird for bird in birds if bird.x > 110], key=lambda x: x.x)
-    print(birdf)
-
-
-# lol()
 pygame.quit()
