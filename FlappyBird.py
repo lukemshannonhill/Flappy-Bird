@@ -22,7 +22,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Flappy bird")
 clock = pygame.time.Clock()
 
-fps = 30
+fps = 60
 pipe_interval = int(750 * 60 / fps)
 
 
@@ -101,5 +101,6 @@ def game():
         clock.tick(fps)
 
 
+# while (1):
 game()
 pygame.quit()

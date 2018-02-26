@@ -8,7 +8,7 @@ class Pipe:
         self.top = random.randint(10, int(height / 2))
         self.bottom = height - self.top - self.gap
         self.x = width
-        self.w = 20
+        self.w = 50
         self.speed = 5
         self.has_hit = False
         self.distance_from_bird_to_end_of_gap = (self.x + int(self.w / 1)) - 100

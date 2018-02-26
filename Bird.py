@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Bird:
     def __init__(self, x, y):
         self.x = x
@@ -11,6 +14,7 @@ class Bird:
         self.horizontal_distance = 0  # Neural Network input 1
         self.height_difference = 0  # Neural Network input 2
         self.f = 0
+        self.random_no = np.random.randint(30, 50)
 
     def position(self):
         return [self.x, self.y]
@@ -53,7 +57,7 @@ class Bird:
         pass
 
     def neuralnetwork_make_decision(self, horizontal_distance, height_difference):
-        if self.f % 30 == 0:
+        if self.f % self.random_no == 0:
             return True
         else:
             return False
