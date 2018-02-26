@@ -3,6 +3,7 @@ import numpy as np
 
 class Bird:
     def __init__(self, x, y):
+        from FlappyBird import width, height
         self.x = x
         self.y = y
         self.radius = 15
@@ -13,8 +14,12 @@ class Bird:
         self.score = 0
         self.horizontal_distance = 0  # Neural Network input 1
         self.height_difference = 0  # Neural Network input 2
+        self.target_point = [width, height]
+
+        # ----Simulates neural network output
         self.f = 0
         self.random_no = np.random.randint(30, 50)
+        # ----Done
 
     def position(self):
         return [self.x, self.y]
@@ -31,8 +36,10 @@ class Bird:
         if self.y - self.radius < 0:
             self.y = self.radius
             self.velocity = 0
+        if self.target_point[0] - self.x - 5 == 0:
+            self.score += 1
 
-            # self.up() if neuralnetwork.makeDecision(self.horizontal_distance,self.height_difference) else pass
+        self.up() if self.neuralnetwork_make_decision(self.horizontal_distance, self.height_difference) else False
 
     def show(self):
         from FlappyBird import pygame, white, screen, red_blue

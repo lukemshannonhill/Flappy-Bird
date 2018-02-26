@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 from pygame.locals import *
 
@@ -14,9 +15,8 @@ red_blue = (255, 0, 255)
 height = 600
 width = 400
 
-pygame = pygame
-
 pygame.init()
+pygame = pygame
 size = width, height
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Flappy bird")
@@ -27,21 +27,21 @@ pipe_interval = int(750 * 60 / fps)
 
 
 def game():
-    y = int(width / 2)
-    bird = Bird(100, y)
-    birds = [bird, Bird(100, 100), Bird(100, 130), Bird(100, 90), Bird(100, 150)]
-    # birds = [bird]
+    birds = []
+    for i in range(1):
+        birds.append(Bird(100, np.random.randint(20, 500)))
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
+    otp = [width, int(height / 2)]
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
             if event.type == USEREVENT + 1:
                 pipes.append(Pipe())
-                for bird in birds:
-                    bird.score += 1
+                # for bird in birds:
+                #     bird.score += 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for bird in birds:
                     bird.up()
@@ -70,30 +70,30 @@ def game():
             closest_pipe_to_right_of_bird = min(pipes_to_right_of_bird,
                                                 key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_end_of_gap)
 
+        # draw target point
+        target_point = [100 + closest_pipe_to_right_of_bird.distance_from_bird_to_end_of_gap if isinstance(
+            closest_pipe_to_right_of_bird, Pipe) else width,
+                        closest_pipe_to_right_of_bird.top + int(
+                            closest_pipe_to_right_of_bird.gap / 2) if closest_pipe_to_right_of_bird else int(
+                            height / 2)]
+
+        pygame.draw.circle(screen, blue, target_point, 5)
+
         for bird in birds:
-            bird.horizontal_distance = closest_pipe_to_right_of_bird.distance_from_bird_to_end_of_gap if isinstance(
-                closest_pipe_to_right_of_bird, Pipe) else width
-            bird.height_difference = (
-                closest_pipe_to_right_of_bird.top + int(closest_pipe_to_right_of_bird.gap / 2) - bird.y) if isinstance(
-                closest_pipe_to_right_of_bird, Pipe) else int(height / 2)
+            bird.horizontal_distance = target_point[0] - bird.x
+            bird.height_difference = target_point[1] - bird.y
+            bird.target_point = target_point
             bird.update()
 
-            if bird.neuralnetwork_make_decision(bird.horizontal_distance, bird.height_difference):
-                bird.up()
-            else:
-                pass
+            if False:
+                if bird.neuralnetwork_make_decision(bird.horizontal_distance, bird.height_difference):
+                    bird.up()
+                else:
+                    pass
 
             bird.show()
 
-        # draw target point
-        pygame.draw.circle(screen, (0, 0, 255),
-                           [100 + closest_pipe_to_right_of_bird.distance_from_bird_to_end_of_gap if isinstance(
-                               closest_pipe_to_right_of_bird, Pipe) else width,
-                            closest_pipe_to_right_of_bird.top + int(
-                                closest_pipe_to_right_of_bird.gap / 2) if closest_pipe_to_right_of_bird else int(
-                                height / 2)], 5)
-
-        if len(birds) == 0:
+        if not len(birds):
             pass
             done = True
 
@@ -101,6 +101,8 @@ def game():
         clock.tick(fps)
 
 
-# while (1):
+# while 1:
+#     game()
 game()
 pygame.quit()
+exit()
