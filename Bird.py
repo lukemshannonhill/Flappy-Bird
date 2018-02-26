@@ -10,6 +10,7 @@ class Bird:
         self.score = 0
         self.horizontal_distance = 0  # Neural Network input 1
         self.height_difference = 0  # Neural Network input 2
+        self.f = 0
 
     def position(self):
         return [self.x, self.y]
@@ -18,7 +19,7 @@ class Bird:
         self.velocity += self.gravity
         self.velocity *= .9
         self.y += int(self.velocity)
-
+        self.f += 1
         from FlappyBird import height
         if self.y + self.radius > height:
             self.y = height - self.radius
@@ -27,7 +28,7 @@ class Bird:
             self.y = self.radius
             self.velocity = 0
 
-            # self.height_difference = self.y
+            # self.up() if neuralnetwork.makeDecision(self.horizontal_distance,self.height_difference) else pass
 
     def show(self):
         from FlappyBird import pygame, white, screen, red_blue
@@ -50,3 +51,9 @@ class Bird:
 
     def perform_action(self):
         pass
+
+    def neuralnetwork_make_decision(self, horizontal_distance, height_difference):
+        if self.f % 30 == 0:
+            return True
+        else:
+            return False
