@@ -23,10 +23,10 @@ pipe_interval = int(750 * 60 / fps)
 
 
 def game():
-    x = 100  # DON'T CHANGE THIS VALUE
     y = int(width / 2)
-    bird = Bird(x, y)
-    birds = [bird, Bird(100, 100), Bird(100, 130), Bird(100, 90), Bird(100, 150)]
+    bird = Bird(100, y)
+    # birds = [bird, Bird(100, 100), Bird(100, 130), Bird(100, 90), Bird(100, 150)]
+    birds = [bird]
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
@@ -58,7 +58,7 @@ def game():
             for bird in birds:
                 if pipe.hit(bird):
                     print("Score of this bird was", bird.score)
-                    # birds.remove(bird)
+                    birds.remove(bird)
                     pass
 
         closest_pipe = [pipe for pipe in pipes if pipe.distance_from_bird_to_center_of_gap > 0]
@@ -71,9 +71,12 @@ def game():
             bird.update()
             bird.show()
 
+        pygame.draw.circle(screen, (0, 0, 255), [100 + minx.distance_from_bird_to_center_of_gap if minx else width,
+                                                 minx.top + int(minx.gap / 2) if minx else int(height / 2)], 5)
+
         if len(birds) == 0:
-            pass
-            # done = True
+            # pass
+            done = True
 
         pygame.display.flip()
         clock.tick(fps)
