@@ -6,6 +6,10 @@ from Pipe import Pipe
 
 black = (0, 0, 0)
 white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+red_blue = (255, 0, 255)
 
 height = 600
 width = 400
@@ -60,18 +64,24 @@ def game():
                     birds.remove(bird)
                     pass
 
-        closest_pipe = [pipe for pipe in pipes if pipe.distance_from_bird_to_center_of_gap > 0]
-        minx = 0
-        if len(closest_pipe) > 0:
-            minx = min(closest_pipe, key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
+        pipes_to_right_of_bird = [pipe for pipe in pipes if pipe.distance_from_bird_to_center_of_gap > 0]
+        closest_pipe_to_right_of_bird = 0
+        if len(pipes_to_right_of_bird) > 0:
+            closest_pipe_to_right_of_bird = min(pipes_to_right_of_bird,
+                                                key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
 
         for bird in birds:
-            bird.horizontal_distance = minx.distance_from_bird_to_center_of_gap if minx else bird.x
+            bird.horizontal_distance = closest_pipe_to_right_of_bird.distance_from_bird_to_center_of_gap if isinstance(
+                closest_pipe_to_right_of_bird, Pipe) else bird.x
             bird.update()
             bird.show()
 
-        pygame.draw.circle(screen, (0, 0, 255), [100 + minx.distance_from_bird_to_center_of_gap if minx else width,
-                                                 minx.top + int(minx.gap / 2) if minx else int(height / 2)], 5)
+        pygame.draw.circle(screen, (0, 0, 255),
+                           [100 + closest_pipe_to_right_of_bird.distance_from_bird_to_center_of_gap if isinstance(
+                               closest_pipe_to_right_of_bird, Pipe) else width,
+                            closest_pipe_to_right_of_bird.top + int(
+                                closest_pipe_to_right_of_bird.gap / 2) if closest_pipe_to_right_of_bird else int(
+                                height / 2)], 5)
 
         if len(birds) == 0:
             # pass

@@ -14,10 +14,10 @@ class Pipe:
         self.distance_from_bird_to_center_of_gap = (self.x + int(self.w / 2)) - 100
 
     def show(self):
-        from FlappyBird import pygame, screen, white, height
+        from FlappyBird import pygame, screen, height, green, red
 
-        pygame.draw.rect(screen, white if not self.has_hit else (255, 0, 0), [self.x, 0, self.w, self.top])
-        pygame.draw.rect(screen, white if not self.has_hit else (255, 0, 0),
+        pygame.draw.rect(screen, green if not self.has_hit else red, [self.x, 0, self.w, self.top])
+        pygame.draw.rect(screen, green if not self.has_hit else red,
                          [self.x, height - self.bottom, self.w, self.bottom])
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 25).render(
@@ -26,7 +26,7 @@ class Pipe:
 
     def update(self):
         self.x -= self.speed
-        self.distance_from_bird_to_center_of_gap = (self.x + int(self.w / 2))-100
+        self.distance_from_bird_to_center_of_gap = (self.x + int(self.w / 2)) - 100
 
     def offscreen(self):
         return self.x < -self.w

@@ -29,20 +29,16 @@ class Bird:
         self.vertical_distance = self.y
 
     def show(self):
-        from FlappyBird import pygame, screen, white
-        pygame.draw.circle(screen, white, self.position(), 15)
-        pygame.draw.line(screen, (0, 255, 0), (self.x, 0), (self.x, self.y))
-        pygame.draw.line(screen, (0, 255, 0),
+        from FlappyBird import pygame, white, screen, green, red_blue
+        pygame.draw.circle(screen, red_blue, self.position(), 15)
+        pygame.draw.line(screen, white, (self.x, 0), (self.x, self.y))
+        pygame.draw.line(screen, white,
                          (self.x, self.y),
                          (self.horizontal_distance + self.x, self.y))
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
-                "{},{}".format(self.vertical_distance, self.horizontal_distance), True, (0, 255, 0)),
+                "{},{}".format(self.vertical_distance, self.horizontal_distance), True, green),
             (self.x + 50, self.y - 30))
 
     def up(self):
         self.velocity += self.lift
-
-    def distance(self, p1, p2):
-        import math
-        return math.pow((math.pow(p1[0] - p2[0], 2) + math.pow(p1[1] - p2[1], 2)), 0.5)
