@@ -1,14 +1,15 @@
 class Bird:
-    def __init__(self, x, y, id=1):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.radius = 15
         self.id = id
         self.gravity = 0.8
         self.velocity = 0
         self.lift = -25
         self.score = 0
-        self.horizontal_distance = 0
-        self.vertical_distance = 0
+        self.horizontal_distance = 0  # Neural Network input 1
+        self.height_difference = 0  # Neural Network input 2
 
     def position(self):
         return [self.x, self.y]
@@ -19,26 +20,33 @@ class Bird:
         self.y += int(self.velocity)
 
         from FlappyBird import height
-        if self.y > height:
-            self.y = height
+        if self.y + self.radius > height:
+            self.y = height - self.radius
             self.velocity = 0
-        if self.y < 0:
-            self.y = 0
+        if self.y - self.radius < 0:
+            self.y = self.radius
             self.velocity = 0
 
-        self.vertical_distance = self.y
+            # self.height_difference = self.y
 
     def show(self):
-        from FlappyBird import pygame, white, screen, green, red_blue
-        pygame.draw.circle(screen, red_blue, self.position(), 15)
-        pygame.draw.line(screen, white, (self.x, 0), (self.x, self.y))
+        from FlappyBird import pygame, white, screen, red_blue
+        pygame.draw.circle(screen, red_blue, self.position(), self.radius)
+        pygame.draw.line(screen, white, (self.x, self.y + self.height_difference), (self.x, self.y))
         pygame.draw.line(screen, white,
                          (self.x, self.y),
                          (self.horizontal_distance + self.x, self.y))
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
-                "{},{}".format(self.vertical_distance, self.horizontal_distance), True, green),
-            (self.x + 50, self.y - 30))
+                "{}".format(self.height_difference), True, white),
+            (self.x + 15, self.y - 100 if self.y - 100 > 0 else 0))
+        screen.blit(
+            pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+                "{}".format(self.horizontal_distance), True, white),
+            (self.x + 50, self.y - 30 if self.y - 30 > 0 else 0))
 
     def up(self):
         self.velocity += self.lift
+
+    def perform_action(self):
+        pass

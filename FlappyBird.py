@@ -22,7 +22,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Flappy bird")
 clock = pygame.time.Clock()
 
-fps = 60
+fps = 30
 pipe_interval = int(750 * 60 / fps)
 
 
@@ -61,23 +61,27 @@ def game():
             for bird in birds:
                 if pipe.hit(bird):
                     print("Score of this bird was", bird.score)
-                    birds.remove(bird)
+                    # birds.remove(bird)
                     pass
 
-        pipes_to_right_of_bird = [pipe for pipe in pipes if pipe.distance_from_bird_to_center_of_gap > 0]
+        pipes_to_right_of_bird = [pipe for pipe in pipes if pipe.distance_from_bird_to_end_of_gap > 0]
         closest_pipe_to_right_of_bird = 0
         if len(pipes_to_right_of_bird) > 0:
             closest_pipe_to_right_of_bird = min(pipes_to_right_of_bird,
-                                                key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
+                                                key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_end_of_gap)
 
         for bird in birds:
-            bird.horizontal_distance = closest_pipe_to_right_of_bird.distance_from_bird_to_center_of_gap if isinstance(
-                closest_pipe_to_right_of_bird, Pipe) else bird.x
+            bird.horizontal_distance = closest_pipe_to_right_of_bird.distance_from_bird_to_end_of_gap if isinstance(
+                closest_pipe_to_right_of_bird, Pipe) else width
+            bird.height_difference = (
+                closest_pipe_to_right_of_bird.top + int(closest_pipe_to_right_of_bird.gap / 2) - bird.y) if isinstance(
+                closest_pipe_to_right_of_bird, Pipe) else int(height / 2)
             bird.update()
             bird.show()
 
+        # draw target point
         pygame.draw.circle(screen, (0, 0, 255),
-                           [100 + closest_pipe_to_right_of_bird.distance_from_bird_to_center_of_gap if isinstance(
+                           [100 + closest_pipe_to_right_of_bird.distance_from_bird_to_end_of_gap if isinstance(
                                closest_pipe_to_right_of_bird, Pipe) else width,
                             closest_pipe_to_right_of_bird.top + int(
                                 closest_pipe_to_right_of_bird.gap / 2) if closest_pipe_to_right_of_bird else int(
