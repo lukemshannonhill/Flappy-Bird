@@ -34,7 +34,7 @@ class Bird:
         pygame.draw.line(screen, (0, 255, 0), (self.x, 0), (self.x, self.y))
         pygame.draw.line(screen, (0, 255, 0),
                          (self.x, self.y),
-                         (self.horizontal_distance + 100, self.y))
+                         (self.horizontal_distance + self.x, self.y))
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
                 "{},{}".format(self.vertical_distance, self.horizontal_distance), True, (0, 255, 0)),

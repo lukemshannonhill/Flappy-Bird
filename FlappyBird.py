@@ -26,7 +26,7 @@ def game():
     x = 100
     y = int(width / 2)
     bird = Bird(x, y)
-    birds = [bird]  # , Bird(100, 100), Bird(100, 130), Bird(100, 100), Bird(100, 150)]
+    birds = [bird, Bird(105, 100), Bird(110, 130), Bird(95, 90), Bird(120, 150)]
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
