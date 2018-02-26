@@ -53,8 +53,7 @@ def game():
         for pipe in pipes:
             pipe.update()
             pipe.show()
-            if pipe.offscreen():
-                pipes.remove(pipe)
+            pipes = [pipe for pipe in pipes if not pipe.offscreen()]
             for bird in birds:
                 if pipe.hit(bird):
                     print("Score of this bird was", bird.score)
