@@ -18,6 +18,9 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Flappy bird")
 clock = pygame.time.Clock()
 
+fps = 24
+pipe_interval = int(750 * 60 / fps)
+
 
 def game():
     x = 100
@@ -26,7 +29,7 @@ def game():
     birds = [bird]  # , Bird(100, 100), Bird(100, 130), Bird(100, 100), Bird(100, 150)]
     pipes = []
     done = False
-    pygame.time.set_timer(USEREVENT + 1, 750)
+    pygame.time.set_timer(USEREVENT + 1, pipe_interval)
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -47,8 +50,6 @@ def game():
 
         screen.fill(black)
 
-        mindist = 999
-        minpipe = Pipe()
         for pipe in pipes:
             pipe.update()
             pipe.show()
@@ -59,13 +60,14 @@ def game():
                     print("Score of this bird was", bird.score)
                     # birds.remove(bird)
                     pass
-            if 0 < pipe.distance < mindist:
-                minpipe = pipe
 
-        min_dist = [minpipe.x + int(minpipe.w / 2), minpipe.top + int(minpipe.gap / 2)]
-        pygame.draw.circle(screen, white, min_dist, 10)
+        closest_pipe = [pipe for pipe in pipes if pipe.distance_from_bird_to_center_of_gap > 0]
+        minx = 0
+        if len(closest_pipe) > 0:
+            minx = min(closest_pipe, key=lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
+
         for bird in birds:
-            bird.closest_pipe_distance = min_dist
+            bird.horizontal_distance = minx.distance_from_bird_to_center_of_gap if minx else bird.x
             bird.update()
             bird.show()
 
@@ -74,8 +76,19 @@ def game():
             # done = True
 
         pygame.display.flip()
-        clock.tick(50)
+        clock.tick(fps)
 
 
 game()
+
+
+def lol():
+    birds = [Bird(123, 321), Bird(105, 100), Bird(120, 130), Bird(1010, 100), Bird(100, 150)]
+    # minx = min(,
+    #            lambda pipe_lambda: pipe_lambda.distance_from_bird_to_center_of_gap)
+    birdf = min([bird for bird in birds if bird.x > 110], key=lambda x: x.x)
+    print(birdf)
+
+
+# lol()
 pygame.quit()
