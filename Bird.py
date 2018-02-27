@@ -39,8 +39,6 @@ class Bird:
         if self.target_point[0] - self.x - 5 == 0:
             self.score += 1
 
-        self.up() if self.neuralnetwork_make_decision(self.horizontal_distance, self.height_difference) else False
-
     def show(self):
         from FlappyBird import pygame, white, screen, red_blue
         pygame.draw.circle(screen, red_blue, self.position(), self.radius)
