@@ -28,8 +28,9 @@ pipe_interval = int(750 * 60 / fps)
 
 def game():
     birds = []
+    birds.append(Bird(100, np.random.randint(20, 500), True))
     for i in range(5):
-        birds.append(Bird(100, np.random.randint(20, 500)))
+        birds.append(Bird(100, np.random.randint(20, 500), True))
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
@@ -90,6 +91,7 @@ def game():
 
         pygame.draw.circle(screen, blue, target_point, 5)
         pygame.draw.line(screen, blue, [0, target_point[1]], [width, target_point[1]])
+        pygame.draw.line(screen, blue, [target_point[0], 0], [target_point[0], height])
 
         # TODO: Thread this
         for bird in birds:
@@ -104,7 +106,7 @@ def game():
                 else:
                     pass
 
-            # bird.show()   draw the birds on main loop
+                    # bird.show()   draw the birds on main loop
         # until this
 
         # Draw birds
@@ -119,8 +121,8 @@ def game():
         clock.tick(fps)
 
 
-# while 1:
-#     game()
-game()
+while 1:
+    game()
+# game()
 pygame.quit()
 exit()
