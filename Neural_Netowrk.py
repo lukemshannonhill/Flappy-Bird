@@ -2,17 +2,29 @@ import numpy as np
 
 
 class NeuronLayer:
-    def __init__(self, neurons, neurons_in_previous_layer):
-        import time
-        np.random.seed(int(time.time()))
-        self.bias = np.random.random()
-        self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - self.bias
+    def __init__(self, neurons, neurons_in_previous_layer, hb=[0.0], w=[[0.0]]):
+        # import time
+        # np.random.seed(int(time.time()))
+        # self.bias = np.random.random()
+        # self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - self.bias
+
+        self.bias = hb
+        self.weights_from_previous_to_this = w
+        print("bias", self.bias)
+        print("weights", self.weights_from_previous_to_this)
+        print("----")
+        # self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - 1
 
 
 class NeuralNetwork:
-    def __init__(self, hidden_layer, output_layer):
-        self.hidden_layer = hidden_layer
-        self.output_layer = output_layer
+    def __init__(self, input_nodes, hidden_nodes, output_nodes):
+        self.hidden_layer = NeuronLayer(hidden_nodes, input_nodes, [0.8990440160748187],
+                                        [[-0.05353412, 0.6649129, -0.24340758, -0.0416839],
+                                         [-0.55266982, -0.50163635, 0.28309926, -0.07587811]])
+        self.output_layer = NeuronLayer(output_nodes, hidden_nodes, [0.23084011213966216], [[1.58517134],
+                                                                                            [0.25307128],
+                                                                                            [1.08582508],
+                                                                                            [1.10956104]])
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -65,23 +77,20 @@ if __name__ == "__main__":
     hidden_nodes = 4
     output_nodes = 1
 
-    hidden_layer = NeuronLayer(hidden_nodes, input_nodes)
-    output_layer = NeuronLayer(output_nodes, hidden_nodes)
-    neural_network = NeuralNetwork(hidden_layer, output_layer)
+    neural_network = NeuralNetwork(input_nodes, hidden_nodes, output_nodes)
+
+    training_set_inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    training_set_outputs = np.array([[0, 1, 1, 0]]).T
 
     # training_set_inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     # training_set_outputs = np.array([[0, 1, 1, 0]]).T
 
-    # training_set_inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    # training_set_outputs = np.array([[0, 1, 1, 0]]).T
-
-    # neural_network.train(training_set_inputs, training_set_outputs, 5000)
-    # hidden_state, output = neural_network.predict(np.array([0, 0]))
-    # print(output)
-    # hidden_state, output = neural_network.predict(np.array([0, 1]))
-    # print(output)
-    # hidden_state, output = neural_network.predict(np.array([1, 0]))
-    # print(output)
-    # neural_network.print_weights()
-    # hidden_state, output = neural_network.predict(np.array([100, 123]))
-    # print(output)
+    neural_network.train(training_set_inputs, training_set_outputs, 5000)
+    hidden_state, output = neural_network.predict(np.array([0, 0]))
+    print(output)
+    hidden_state, output = neural_network.predict(np.array([0, 1]))
+    print(output)
+    hidden_state, output = neural_network.predict(np.array([1, 0]))
+    print(output)
+    hidden_state, output = neural_network.predict(np.array([1, 1]))
+    print(output)

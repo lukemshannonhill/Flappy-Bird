@@ -23,14 +23,13 @@ pygame.display.set_caption("Flappy bird")
 clock = pygame.time.Clock()
 
 fps = 60
-pipe_interval = int(750 * 60 / fps)
+pipe_interval = int(900 * 60 / fps)
 
 
 def game():
     birds = []
-    birds.append(Bird(100, np.random.randint(20, 500), True))
-    for i in range(5):
-        birds.append(Bird(100, np.random.randint(20, 500), True))
+    for i in range(2):
+        birds.append(Bird(100, np.random.randint(20, 500), show_bird=True))
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
@@ -99,14 +98,12 @@ def game():
             bird.horizontal_distance = target_point[0] - bird.x
             bird.height_difference = target_point[1] - bird.y
             bird.target_point = target_point
-            # Simulate neural network if True
-            if False:
-                if bird.neuralnetwork_make_decision(bird.horizontal_distance, bird.height_difference):
-                    bird.up()
-                else:
-                    pass
+            if bird.neural_network_make_decision(bird.horizontal_distance, bird.height_difference, simulated=False):
+                bird.up()
+            else:
+                pass
 
-                    # bird.show()   draw the birds on main loop
+                # bird.show()   draw the birds on main loop
         # until this
 
         # Draw birds
@@ -121,7 +118,10 @@ def game():
         clock.tick(fps)
 
 
+i = 0
 while 1:
+    i += 1
+    print("new game", i)
     game()
 # game()
 pygame.quit()

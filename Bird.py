@@ -1,11 +1,13 @@
 import numpy as np
 
+from Neural_Netowrk import NeuralNetwork
+
 
 class Bird:
-    def __init__(self, x, y, showb=False):
+    def __init__(self, x, y, show_bird=False):
         from FlappyBird import width, height
         self.x = x
-        self.showb = showb
+        self.show_bird = show_bird
         self.y = y
         self.radius = 15
 
@@ -23,6 +25,8 @@ class Bird:
         self.f = 0
         self.random_no = np.random.randint(30, 50)
         # ----Done
+
+        self.neural_network = NeuralNetwork(input_nodes=2, hidden_nodes=4, output_nodes=1)
 
     def position(self):
         return [self.x, self.y]
@@ -43,7 +47,7 @@ class Bird:
             self.score += 1
 
     def show(self):
-        if self.showb:
+        if self.show_bird:
             from FlappyBird import pygame, white, screen, red_blue
             pygame.draw.circle(screen, red_blue, self.position(), self.radius)
             pygame.draw.line(screen, white, (self.x, self.y + self.height_difference), (self.x, self.y))
@@ -65,8 +69,14 @@ class Bird:
     def perform_action(self):
         pass
 
-    def neuralnetwork_make_decision(self, horizontal_distance, height_difference):
-        if self.f % self.random_no == 0:
-            return True
+    def neural_network_make_decision(self, horizontal_distance, height_difference, simulated=True):
+        if simulated:
+            if self.f % self.random_no == 0:
+                return True
+            else:
+                return False
         else:
-            return False
+
+            # print(horizontal_distance, height_difference,
+            #       self.neural_network.predict([horizontal_distance, height_difference])[1])
+            return self.neural_network.predict([horizontal_distance, height_difference])[1] > 0.8153
