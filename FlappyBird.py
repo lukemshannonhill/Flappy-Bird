@@ -1,8 +1,7 @@
-import numpy as np
 import pygame
 from pygame.locals import *
 
-from Bird import Bird
+from Genetic_Algorithm import Genetic_Algorithm
 from Pipe import Pipe
 
 black = (0, 0, 0)
@@ -23,13 +22,12 @@ pygame.display.set_caption("Flappy bird")
 clock = pygame.time.Clock()
 
 fps = 60
-pipe_interval = int(900 * 60 / fps)
+pipe_interval = int(1000 * 60 / fps)
 
 
 def game():
-    birds = []
-    for i in range(2):
-        birds.append(Bird(100, np.random.randint(20, 500), show_bird=True))
+    birds = ga.get_population()
+    pipe_level = 1
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
@@ -42,34 +40,28 @@ def game():
                 pygame.quit()
                 exit()
             if event.type == USEREVENT + 1:
-                pipes.append(Pipe())
+                pipes.append(Pipe(pipe_level))
+                pipe_level += 1
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # TODO: Thread this
                 for bird in birds:
                     bird.up()
-                    # until this
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    # TODO: Thread this
                     for bird in birds:
                         bird.up()
-                        # until this
                 if event.key == pygame.K_ESCAPE:
                     done = True
                     pygame.quit()
                     exit()
 
-        # TODO: Thread this
         for pipe in pipes:
             pipe.update()
-            # pipe.show()   draw functions should be in main loop
             pipes = [pipe for pipe in pipes if not pipe.offscreen()]
             for bird in birds:
                 if pipe.hit(bird):
-                    print("Score of this bird was", bird.score)
+                    # print("Score of this bird was", bird.score)
                     birds.remove(bird)
                     pass
-        # until this
 
         # Drawing pipes
         for pipe in pipes:
@@ -92,8 +84,10 @@ def game():
         pygame.draw.line(screen, blue, [0, target_point[1]], [width, target_point[1]])
         pygame.draw.line(screen, blue, [target_point[0], 0], [target_point[0], height])
 
-        # TODO: Thread this
         for bird in birds:
+            if bird.hit_walls():
+                birds.remove(bird)
+                continue
             bird.update()
             bird.horizontal_distance = target_point[0] - bird.x
             bird.height_difference = target_point[1] - bird.y
@@ -102,9 +96,6 @@ def game():
                 bird.up()
             else:
                 pass
-
-                # bird.show()   draw the birds on main loop
-        # until this
 
         # Draw birds
         for bird in birds:
@@ -118,11 +109,15 @@ def game():
         clock.tick(fps)
 
 
+ga = Genetic_Algorithm(population_size=6)  # always keep 6
+
 i = 0
 while 1:
     i += 1
-    print("new game", i)
+    print("New game", i)
     game()
+    print("Best bird", ga.get_best_unit().score, "\n")
+    ga.next_generation()
 # game()
 pygame.quit()
 exit()

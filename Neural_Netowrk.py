@@ -2,29 +2,44 @@ import numpy as np
 
 
 class NeuronLayer:
-    def __init__(self, neurons, neurons_in_previous_layer, hb=[0.0], w=[[0.0]]):
+    def __init__(self, neurons, neurons_in_previous_layer, b=[0.0], w=[[0.0]]):
         # import time
         # np.random.seed(int(time.time()))
-        # self.bias = np.random.random()
-        # self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - self.bias
+        # np.random.seed(1)
+        self.bias = np.random.random()
+        self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - self.bias
 
-        self.bias = hb
-        self.weights_from_previous_to_this = w
-        print("bias", self.bias)
-        print("weights", self.weights_from_previous_to_this)
-        print("----")
+        # self.bias = b
+        # self.weights_from_previous_to_this = w
+        # print("bias", self.bias)
+        # print("weights", self.weights_from_previous_to_this)
+        # print("----")
         # self.weights_from_previous_to_this = 2 * np.random.random((neurons_in_previous_layer, neurons)) - 1
 
 
 class NeuralNetwork:
     def __init__(self, input_nodes, hidden_nodes, output_nodes):
-        self.hidden_layer = NeuronLayer(hidden_nodes, input_nodes, [0.8990440160748187],
-                                        [[-0.05353412, 0.6649129, -0.24340758, -0.0416839],
-                                         [-0.55266982, -0.50163635, 0.28309926, -0.07587811]])
-        self.output_layer = NeuronLayer(output_nodes, hidden_nodes, [0.23084011213966216], [[1.58517134],
-                                                                                            [0.25307128],
-                                                                                            [1.08582508],
-                                                                                            [1.10956104]])
+        self.hidden_layer = NeuronLayer(hidden_nodes, input_nodes, b=[0.8990440160748187],
+                                        w=[[-0.05353412, 0.6649129, -0.24340758, -0.0416839],
+                                           [-0.55266982, -0.50163635, 0.28309926, -0.07587811]])
+        self.output_layer = NeuronLayer(output_nodes, hidden_nodes, b=[0.23084011213966216], w=[[1.58517134],
+                                                                                                [0.25307128],
+                                                                                                [1.08582508],
+                                                                                                [1.10956104]])
+
+    def get_hidden_weights_and_bias(self):
+        return self.hidden_layer.weights_from_previous_to_this, self.hidden_layer.bias
+
+    def get_output_weights_and_bias(self):
+        return self.output_layer.weights_from_previous_to_this, self.output_layer.bias
+
+    def set_hidden_weights_and_bias(self, hidden_weights, hidden_bias):
+        self.hidden_layer.weights_from_previous_to_this = hidden_weights
+        self.hidden_layer.bias = hidden_bias
+
+    def set_output_weights_and_bias(self, output_weights, output_bias):
+        self.output_layer.weights_from_previous_to_this = output_weights
+        self.output_layer.bias = output_bias
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -62,7 +77,6 @@ class NeuralNetwork:
             print(hidden_output)
             print(output)
             print("--")
-
         return hidden_output, output
 
     def print_weights(self):

@@ -15,12 +15,13 @@ class Bird:
         self.velocity = 0
         self.lift = -25
 
-        self.score = 0
+        self.score = 0  # Fitness function
 
         self.horizontal_distance = 0  # Neural Network input 1
         self.height_difference = 0  # Neural Network input 2
         self.target_point = [width, height]
 
+        self.alive_time = 0
         # ----Simulates neural network output
         self.f = 0
         self.random_no = np.random.randint(30, 50)
@@ -36,6 +37,7 @@ class Bird:
         self.velocity *= .9
         self.y += int(self.velocity)
         self.f += 1
+        self.alive_time += 1
         from FlappyBird import height
         if self.y + self.radius > height:
             self.y = height - self.radius
@@ -69,6 +71,12 @@ class Bird:
     def perform_action(self):
         pass
 
+    def hit_walls(self):
+        from FlappyBird import height
+        if self.y - self.radius == 0 or self.y + self.radius == height:
+            return True
+        return False
+
     def neural_network_make_decision(self, horizontal_distance, height_difference, simulated=True):
         if simulated:
             if self.f % self.random_no == 0:
@@ -76,7 +84,6 @@ class Bird:
             else:
                 return False
         else:
-
             # print(horizontal_distance, height_difference,
             #       self.neural_network.predict([horizontal_distance, height_difference])[1])
-            return self.neural_network.predict([horizontal_distance, height_difference])[1] > 0.8153
+            return self.neural_network.predict([horizontal_distance, height_difference])[1] > 0.7
