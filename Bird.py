@@ -22,6 +22,7 @@ class Bird:
         self.target_point = [width, height]
 
         self.alive_time = 0
+
         # ----Simulates neural network output
         self.f = 0
         self.random_no = np.random.randint(30, 50)
@@ -67,9 +68,6 @@ class Bird:
 
     def up(self):
         self.velocity += self.lift
-
-    def perform_action(self):
-        pass
 
     def hit_walls(self):
         from FlappyBird import height
