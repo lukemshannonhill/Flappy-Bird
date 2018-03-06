@@ -5,6 +5,7 @@ import numpy as np
 from NEAT.ConnectionGene import ConnectionGene
 from NEAT.InnovationNumberGenerator import InnovationNumberGenerator
 from NEAT.NodeGene import Type, NodeGene
+from NEAT.Species import Species
 
 """
 Based on the paper: Evolving Neural Networks through Augmenting Topologies
@@ -12,32 +13,40 @@ Based on the paper: Evolving Neural Networks through Augmenting Topologies
 
 
 class Genome:
-    def __init__(self, connection_genes, fitness=0):
+    def __init__(self, connection_genes, input_nodes=2, output_nodes=1, fitness=0):
+        """
+        Constructor for the genome object
+        :param connection_genes: Dictionary of connection genes
+        :param input_nodes: Number of input nodes
+        :param output_nodes: Number of output nodes
+        :param fitness: Fitness of this genome
+        """
         self.connection_genes = connection_genes  # Dictionary of (innovation_number: ConnectionGene)
-        self.input_nodes = {1: NodeGene(1, Type.INPUT), 2: NodeGene(2, Type.INPUT), 3: NodeGene(3, Type.INPUT)}
-        self.output_nodes = {4: NodeGene(4, Type.OUTPUT)}
-        self.hidden_nodes = self.generate_nodes()  # List of Tuple(id)
+        self.input_nodes = self.generate_input_nodes(input_nodes)
+        self.output_nodes = self.generate_output_nodes(output_nodes)
+        self.hidden_nodes = self.generate_hidden_nodes()  # List of Tuple(id)
         self.nodes = {**self.input_nodes, **self.hidden_nodes, **self.output_nodes}
         self.innovation_number_generator = InnovationNumberGenerator(self.get_last_innovation_number())
         self.fitness = fitness
+        self.global_rank = 0
 
     def total_nodes(self):
         """
         Return sum of input nodes, hidden nodes and output nodes
         :return: The total count of all nodes in this genome
         """
-        return len(self.input_nodes) + len(self.hidden_nodes) + len(self.output_nodes)
+        return len(self.nodes)
 
     def get_last_innovation_number(self):
         """
         Gets the last used innovation number for this genome
         :return: Innovation number which was last used
         """
-        return sorted(self.connection_genes.keys())[-1]
+        return max(self.connection_genes.keys())
 
-    def generate_nodes(self):
+    def generate_hidden_nodes(self):
         """
-        Generates node objects using the connection genes
+        Generates hidden node objects using the connection genes
         :return: Dictionary of nodes keyed by node id
         """
         nodes = dict()
@@ -93,10 +102,9 @@ class Genome:
 
         new_connection = ConnectionGene(in_node=node_2.id if reversed else node_1.id,
                                         out_node=node_1.id if reversed else node_2.id,
-                                        weight=np.random.random(),
+                                        weight=np.random.uniform(),
                                         enabled=True,
-                                        innovation_number=self.innovation_number_generator.next_int()
-                                        )
+                                        innovation_number=self.innovation_number_generator.next_int())
         self.connection_genes[new_connection.innovation_number] = new_connection
 
     def add_node_mutation(self):
@@ -130,60 +138,6 @@ class Genome:
         self.connection_genes[new_connection_2.innovation_number] = new_connection_2
 
     @staticmethod
-    def crossover(parent_1_genome, parent_2_genome):
-        """
-        Abstract for crossover between two genomes
-        :param parent_1_genome: The genome for 1st parent
-        :param parent_2_genome: The genome for 2nd parent
-        :return: Child genome with mutation applied
-        """
-        child_connections = Genome.get_child_connections(parent_1_genome, parent_2_genome)
-        child_genome = Genome(child_connections)
-        if np.random.random() < 0.5:
-            child_genome.add_node_mutation()
-        if np.random.random() < 0.5:
-            child_genome.add_connection_mutation()
-        return child_genome
-
-    @staticmethod
-    def get_child_connections(parent_1_genome, parent_2_genome):
-        """
-        Performs actual crossover between the two genomes
-        :param parent_1_genome: The genome for 1st parent
-        :param parent_2_genome: The genome for 2nd parent
-        :return: Child genome connections dictionary
-        """
-        child_connections = dict()
-
-        if parent_1_genome.fitness > parent_2_genome.fitness:
-            parent_1_genome, parent_2_genome = parent_1_genome, parent_2_genome
-        elif parent_1_genome.fitness < parent_2_genome.fitness:
-            parent_1_genome, parent_2_genome = parent_2_genome, parent_1_genome
-        else:
-            parent_1_genome, parent_2_genome = parent_1_genome, parent_2_genome
-
-        parent_1_connections = parent_1_genome.connection_genes
-        parent_2_connections = parent_2_genome.connection_genes
-
-        if parent_1_genome.fitness != parent_2_genome.fitness:
-            for k, v in parent_1_connections.items():
-                if parent_2_connections.get(k) is None:
-                    child_connections[k] = parent_1_connections[k]
-                else:
-                    child_connections[k] = v if np.random.random() < 0.5 else parent_2_connections[k]
-        else:
-            for k, v in parent_1_connections.items():
-                if parent_2_connections.get(k) is None:
-                    child_connections[k] = parent_1_connections[k]
-            for k, v in parent_2_connections.items():
-                if parent_1_connections.get(k) is None:
-                    child_connections[k] = parent_2_connections[k]
-            for k, v in parent_1_connections.items():
-                if parent_1_connections.get(k) is not None and parent_2_connections.get(k) is not None:
-                    child_connections[k] = v if np.random.random() < 0.5 else parent_2_connections[k]
-        return child_connections
-
-    @staticmethod
     def get_matching_connections(parent_1_genome, parent_2_genome):
         """
         Finds the connections between the two genomes which have the same innovation number
@@ -197,7 +151,7 @@ class Genome:
         parent_2_connections = parent_2_genome.connection_genes
         for k, v in parent_1_connections.items():
             if k in parent_2_connections:
-                matching_connections[k] = v if np.random.random() < 0.5 else parent_2_connections[k]
+                matching_connections[k] = v if np.random.uniform() < 0.5 else parent_2_connections[k]
         return matching_connections
 
     @staticmethod
@@ -263,18 +217,13 @@ class Genome:
         Prints the genotype of the genome
         """
         return_string = ""
-        return_string += "----------------------"
-        print("----------------------")
+        return_string += "----------------------\n"
 
         for k, v in self.nodes.items():
             return_string += v.__repr__()
-            print(v)
-        print()
         for k, v in self.connection_genes.items():
             return_string += v.__repr__()
-            print(v)
         return_string += "----------------------"
-        print("----------------------\n")
         return return_string
 
     @staticmethod
@@ -326,8 +275,80 @@ class Genome:
                 weight_difference += abs(v.weight - parent_2_connections[k].weight)
         return float(weight_difference / matching_connections)
 
+    def perturb_weights(self, weight_perturb_rate):
+        """
+        Changes or perturbs each of the weights according to the rate provided
+        :param weight_perturb_rate: The rate at which weights will be perturbed or changed slightly
+        """
+        for k, v in self.connection_genes.items():
+            v.weight = v.weight * (
+                np.random.uniform() * 4.0 - 2.0) if np.random.uniform() < weight_perturb_rate else v.weight
+
+    def reassign_weights(self, weight_reassign_rate):
+        """
+        Reassigns each of the weights according to the rate provided
+        :param weight_reassign_rate: The rate at which weights will be reassigned
+        """
+        for k, v in self.connection_genes.items():
+            v.weight = np.random.uniform() if np.random.uniform() < weight_reassign_rate else v.weight
+
     def __repr__(self):
         return self.print_genome()
+
+    def enable_disable_gene(self, connection_enable_disable_rate):
+        """
+        Toggles some of the genes depending on the rate provided
+        :param connection_enable_disable_rate: The rate at which gene will be toggled
+        """
+        for k, v in self.connection_genes.items():
+            v.enabled = not v.enabled if np.random.uniform() < connection_enable_disable_rate else v.enabled
+
+    @staticmethod
+    def get_random_connection_genes(input_nodes, output_nodes):
+        """
+        Useful function for generating random connection genes
+        :param input_nodes: Number of input nodes
+        :param output_nodes: Number of output nodes
+        :return: Random connection genes dictionary
+        """
+        connection_genes = dict()
+        innovation_number = 1
+        for i in range(1, input_nodes + 1):
+            for j in range(1, output_nodes + 1):
+                connection_genes[innovation_number] = ConnectionGene(
+                    in_node=i,
+                    out_node=input_nodes + j,
+                    weight=np.random.random(),
+                    enabled=np.random.random() < 0.5,
+                    innovation_number=innovation_number
+                )
+                innovation_number += 1
+        return connection_genes
+
+    def generate_input_nodes(self, input_nodes):
+        """
+        Generate input_nodes number of node objects
+        :param input_nodes: Number of input nodes
+        :return: Dictionary of nodes
+        """
+        input_nodes_dict = dict()
+        for i in range(1, input_nodes + 1):
+            input_nodes_dict[i] = NodeGene(i, Type.INPUT)
+        return input_nodes_dict
+
+    def generate_output_nodes(self, output_nodes):
+        """
+        Generate output_nodes number of node objects
+        :param output_nodes: Number of output nodes
+        :return: Dictionary of nodes
+        """
+        output_nodes_dict = dict()
+        for i in range(1, output_nodes + 1):
+            output_nodes_dict[len(self.input_nodes) + i] = NodeGene(len(self.input_nodes) + i, Type.OUTPUT)
+        return output_nodes_dict
+
+    def __eq__(self, other):
+        return [p1g for p1g in self.connection_genes].__eq__([p2g for p2g in other.connection_genes])
 
 
 # Testing starts #
@@ -356,10 +377,13 @@ for i in range(1, 10):
     parent_2_genes[locals()['cg{}'.format(i)].innovation_number] = locals()['cg{}'.format(i)]
 parent_2_genome = Genome(parent_2_genes)
 
-# print(Genome.crossover(parent_1_genome, parent_2_genome))
+# print(Species.crossover(parent_1_genome, parent_2_genome))
 # print(Genome.get_matching_connections(parent_1_genome, parent_2_genome))
 # print(Genome.get_disjoint_connections(parent_1_genome, parent_2_genome))
 # print(Genome.get_excess_connections(parent_1_genome, parent_2_genome))
 # print(Genome.get_compatibility_distance(parent_1_genome, parent_2_genome))
 
 # Testing ends #
+
+s = Species([parent_1_genome, parent_2_genome])
+# print(s.top_fitness)
