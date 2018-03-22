@@ -5,12 +5,12 @@ import numpy as np
 
 
 class Species:
-    def __init__(self, genomes):
+    def __init__(self, genome):
         """
         Constructor for species which has a list of genomes
         :param genomes: List of genomes in this species
         """
-        self.genomes = genomes
+        self.genomes = [genome]
         self.top_fitness = self.get_max_fitness()
         self.average_fitness = self.calculate_average_fitness()
         self.staleness = 0.0
@@ -28,7 +28,7 @@ class Species:
         :return: Average fitness of all the genomes
         """
         return float(
-            reduce(lambda genome_1, genome_2: genome_1.fitness + genome_2.fitness, self.genomes) / len(self.genomes)
+            reduce(lambda sum, genome_1: sum + genome_1.fitness, self.genomes, 0.0) / len(self.genomes),
         )
 
     def make_child(self):

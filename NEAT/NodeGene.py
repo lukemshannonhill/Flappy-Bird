@@ -10,9 +10,13 @@ class NodeGene:
         """
         self.id = id
         self.type = type
+        self.output = None
+
+    def fire_neuron(self):
+        pass
 
     def __repr__(self):
-        return "Node ID: {}\tType: {}\n".format(self.id, self.type)
+        return "Node ID: {}\tType: {}\tOutput: {}\n".format(self.id, self.type, self.output)
 
 
 class Type(Enum):

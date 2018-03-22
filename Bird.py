@@ -4,7 +4,7 @@ from Neural_Netowrk import NeuralNetwork
 
 
 class Bird:
-    def __init__(self, x, y, show_bird=False):
+    def __init__(self, x, y, genome=None, show_bird=False):
         from FlappyBird import width, height
         self.x = x
         self.show_bird = show_bird
@@ -29,6 +29,7 @@ class Bird:
         # ----Done
 
         self.neural_network = NeuralNetwork(input_nodes=2, hidden_nodes=4, output_nodes=1)
+        # self.neural_network = genome
 
     def position(self):
         return [self.x, self.y]
@@ -39,6 +40,9 @@ class Bird:
         self.y += int(self.velocity)
         self.f += 1
         self.alive_time += 1
+
+        # self.nn.fitness = self.f + self.alive_time
+
         from FlappyBird import height
         if self.y + self.radius > height:
             self.y = height - self.radius
@@ -84,4 +88,6 @@ class Bird:
         else:
             # print(horizontal_distance, height_difference,
             #       self.neural_network.predict([horizontal_distance, height_difference])[1])
+            # print([horizontal_distance, height_difference],self.nn.evaluate([horizontal_distance, height_difference]))
+            # return self.neural_network.evaluate([horizontal_distance, height_difference]) > 0.5
             return self.neural_network.predict([horizontal_distance, height_difference])[1] > 0.7

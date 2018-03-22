@@ -5,7 +5,6 @@ import numpy as np
 from NEAT.ConnectionGene import ConnectionGene
 from NEAT.InnovationNumberGenerator import InnovationNumberGenerator
 from NEAT.NodeGene import Type, NodeGene
-from NEAT.Species import Species
 
 """
 Based on the paper: Evolving Neural Networks through Augmenting Topologies
@@ -25,7 +24,7 @@ class Genome:
         self.input_nodes = self.generate_input_nodes(input_nodes)
         self.output_nodes = self.generate_output_nodes(output_nodes)
         self.hidden_nodes = self.generate_hidden_nodes()  # List of Tuple(id)
-        self.nodes = {**self.input_nodes, **self.hidden_nodes, **self.output_nodes}
+        self.nodes = {**self.input_nodes, **self.hidden_nodes, **self.output_nodes}  # Dictionary of (node_id: NodeGene)
         self.innovation_number_generator = InnovationNumberGenerator(self.get_last_innovation_number())
         self.fitness = fitness
         self.global_rank = 0
@@ -87,6 +86,9 @@ class Genome:
         if node_1.type == Type.HIDDEN and node_2.type == Type.INPUT:
             reversed = True
 
+        if reversed:
+            return
+
         connection_exists = False
         for connection_gene in self.connection_genes:
             connection_gene = self.connection_genes[connection_gene]
@@ -113,7 +115,8 @@ class Genome:
         o =========== 0    Old connection
         o ==== o ==== o    New connections
         """
-        old_connection = self.connection_genes[random.choice(list(self.connection_genes.keys()))]
+        old_connection = ConnectionGene(1, 4, 1, True,
+                                        self.connection_genes[random.choice(list(self.connection_genes.keys()))])
 
         in_node = old_connection.in_node
         out_node = old_connection.out_node
@@ -133,9 +136,10 @@ class Genome:
                                           enabled=True,
                                           innovation_number=self.innovation_number_generator.next_int())
 
-        self.nodes[new_node.id] = new_node
         self.connection_genes[new_connection_1.innovation_number] = new_connection_1
         self.connection_genes[new_connection_2.innovation_number] = new_connection_2
+
+        self.nodes[new_node.id] = new_node
 
     @staticmethod
     def get_matching_connections(parent_1_genome, parent_2_genome):
@@ -304,7 +308,7 @@ class Genome:
             v.enabled = not v.enabled if np.random.uniform() < connection_enable_disable_rate else v.enabled
 
     @staticmethod
-    def get_random_connection_genes(input_nodes, output_nodes):
+    def get_random_connection_genes(input_nodes, output_nodes, init=False):
         """
         Useful function for generating random connection genes
         :param input_nodes: Number of input nodes
@@ -319,7 +323,7 @@ class Genome:
                     in_node=i,
                     out_node=input_nodes + j,
                     weight=np.random.random(),
-                    enabled=np.random.random() < 0.5,
+                    enabled=np.random.random() < 0.5 if not init else True,
                     innovation_number=innovation_number
                 )
                 innovation_number += 1
@@ -336,6 +340,10 @@ class Genome:
             input_nodes_dict[i] = NodeGene(i, Type.INPUT)
         return input_nodes_dict
 
+    def set_inputs(self, inputs):
+        for key, input_node in self.input_nodes.items():
+            input_node.output = inputs[key - 1]
+
     def generate_output_nodes(self, output_nodes):
         """
         Generate output_nodes number of node objects
@@ -347,43 +355,70 @@ class Genome:
             output_nodes_dict[len(self.input_nodes) + i] = NodeGene(len(self.input_nodes) + i, Type.OUTPUT)
         return output_nodes_dict
 
+    def evaluate(self, inputs):
+        from functools import reduce
+        for i, node_id in enumerate(self.input_nodes):
+            self.input_nodes[node_id].output = inputs[i]
+        while self.output_nodes[3].output is None:
+            for node_id, node in self.nodes.items():
+                connections_to_this_node = [connection for iv, connection in self.connection_genes.items() if
+                                            connection.out_node == node_id and connection.enabled]
+                if len(connections_to_this_node) != 0:
+                    self.nodes[node_id].output = self.sigmoid(reduce(
+                        lambda sum1, next_tuple: sum1 + next_tuple[0] * next_tuple[1]
+                        if next_tuple[1] is not None and sum1 is not None else None,
+                        [(connection.weight, self.nodes[connection.in_node].output) for connection in
+                         connections_to_this_node],
+                        0.0))
+        print(inputs, self.output_nodes[3].output)
+        return self.output_nodes[3].output
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
     def __eq__(self, other):
         return [p1g for p1g in self.connection_genes].__eq__([p2g for p2g in other.connection_genes])
 
 
-# Testing starts #
-cg1 = ConnectionGene(1, 4, 0.5, True, 1)
-cg2 = ConnectionGene(2, 4, 0.5, False, 2)
-cg3 = ConnectionGene(3, 4, 0.5, True, 3)
-cg4 = ConnectionGene(2, 5, 0.5, True, 4)
-cg5 = ConnectionGene(5, 4, 0.5, True, 5)
-cg6 = ConnectionGene(1, 5, 0.5, True, 8)
-parent_1_genes = dict()
-for i in range(1, 7):
-    parent_1_genes[locals()['cg{}'.format(i)].innovation_number] = locals()['cg{}'.format(i)]
-parent_1_genome = Genome(parent_1_genes)
+if __name__ == '__main__':
+    ccg1 = ConnectionGene(1, 4, 1, True, 1)
+    ccg2 = ConnectionGene(1, 5, 2, True, 2)
+    ccg3 = ConnectionGene(1, 6, 3, True, 3)
+    ccg4 = ConnectionGene(2, 4, 4, True, 4)
+    ccg5 = ConnectionGene(2, 5, 5, True, 5)
+    ccg6 = ConnectionGene(2, 6, 6, True, 6)
+    ccg7 = ConnectionGene(4, 3, 7, True, 7)
+    ccg8 = ConnectionGene(5, 3, 8, True, 8)
+    ccg9 = ConnectionGene(6, 3, 9, True, 9)
+    eg = dict()
+    for i in range(1, 10):
+        eg[locals()['ccg{}'.format(i)].innovation_number] = locals()['ccg{}'.format(i)]
+    eg_genome = Genome(eg)
+    eg_genome.set_inputs([1, 2])
 
-cg1 = ConnectionGene(1, 4, 0.5, True, 1)
-cg2 = ConnectionGene(2, 4, 0.5, False, 2)
-cg3 = ConnectionGene(3, 4, 0.5, True, 3)
-cg4 = ConnectionGene(2, 5, 0.5, True, 4)
-cg5 = ConnectionGene(5, 4, 0.5, False, 5)
-cg6 = ConnectionGene(5, 6, 0.5, True, 6)
-cg7 = ConnectionGene(6, 4, 0.5, True, 7)
-cg8 = ConnectionGene(3, 5, 0.5, True, 9)
-cg9 = ConnectionGene(1, 6, 0.5, True, 10)
-parent_2_genes = dict()
-for i in range(1, 10):
-    parent_2_genes[locals()['cg{}'.format(i)].innovation_number] = locals()['cg{}'.format(i)]
-parent_2_genome = Genome(parent_2_genes)
+    c1 = ConnectionGene(1, 4, 1, True, 1)
+    c2 = ConnectionGene(1, 5, 3, True, 2)
+    c3 = ConnectionGene(2, 4, 2, True, 3)
+    c4 = ConnectionGene(2, 5, 4, True, 4)
+    c5 = ConnectionGene(4, 6, 5, True, 5)
+    c6 = ConnectionGene(4, 7, 7, True, 6)
+    c7 = ConnectionGene(5, 6, 6, True, 7)
+    c8 = ConnectionGene(5, 7, 8, True, 8)
+    c9 = ConnectionGene(6, 3, 9, True, 9)
+    c10 = ConnectionGene(7, 3, 10, True, 10)
+    c11 = ConnectionGene(1, 7, 20, True, 11)
+    c12 = ConnectionGene(1, 8, 1, True, 12)
+    c13 = ConnectionGene(8, 4, 1, True, 13)
 
-# print(Species.crossover(parent_1_genome, parent_2_genome))
-# print(Genome.get_matching_connections(parent_1_genome, parent_2_genome))
-# print(Genome.get_disjoint_connections(parent_1_genome, parent_2_genome))
-# print(Genome.get_excess_connections(parent_1_genome, parent_2_genome))
-# print(Genome.get_compatibility_distance(parent_1_genome, parent_2_genome))
+    c14 = ConnectionGene(4, 3, 0.7787, True, 14)
+    aa = dict()
+    for i in range(1, 15):
+        aa[locals()['c{}'.format(i)].innovation_number] = locals()['c{}'.format(i)]
+    a = Genome(aa)
+    # a.add_connection_mutation()
+    # a.set_inputs([1, 2])
 
-# Testing ends #
-
-s = Species([parent_1_genome, parent_2_genome])
-# print(s.top_fitness)
+    # a.add_node_mutation()
+    # print(a.nodes)
+    # print(a.connection_genes)
+    # print(a.evaluate([1, 2]))

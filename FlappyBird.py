@@ -27,6 +27,10 @@ pipe_interval = int(1000 * 60 / fps)
 
 def game():
     birds = ga.get_population()
+
+    # for bird in birds:
+    #     print(bird.neural_network)
+    # input()
     pipe_level = 1
     pipes = []
     done = False
@@ -110,7 +114,6 @@ def game():
 
 
 ga = Genetic_Algorithm(population_size=6)  # always keep 6
-
 i = 0
 while 1:
     i += 1
@@ -119,5 +122,14 @@ while 1:
     print("Best bird", ga.get_best_unit().score, "\n")
     ga.next_generation()
 # game()
+
+# new_ga = Population(population_size=6)
+# i = 0
+# while 1:
+#     i += 1
+#     print("New game", i)
+#     game()
+#     new_ga.create_new_generation()
+
 pygame.quit()
 exit()
