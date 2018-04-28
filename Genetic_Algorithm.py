@@ -15,7 +15,7 @@ class Genetic_Algorithm:
     def reset_population(self):
         self.population = list()
         for bird in self.elites:
-            self.population.append(bird)
+            self.population.append(bird[1])
             print("Added from elites")
         if len(self.population) < self.population_size:
             for i in range(len(self.population), self.population_size):
@@ -28,18 +28,22 @@ class Genetic_Algorithm:
         return sorted(self.population, key=lambda bird: bird.alive_time)[-1]
 
     def add_to_elites(self):
-        if len(self.elites) == 0:
-            if self.get_best_unit().score != 0:
-                self.elites.append(self.get_best_unit())
+        best_bird = self.get_best_unit()
+        if len(self.elites) < 6:
+            if best_bird.alive_time != 0:
+                self.elites.append([best_bird.alive_time, best_bird])
                 print("added to elites, now elites are", len(self.elites))
 
         else:
-            if self.get_best_unit().alive_time > self.elites[- 1].alive_time:
+            if best_bird.alive_time > self.elites[0][1].alive_time:
                 print("added to elites, now elites are", len(self.elites))
-                self.elites.append(self.get_best_unit())
+                print("replacing a weak elite")
+                self.elites.pop(0)
+                self.elites.append([best_bird.alive_time, best_bird])
 
-            if len(self.elites) > self.population_size:
-                self.elites = self.elites[len(self.elites) - self.population_size:]
+        self.elites.sort(key=lambda i: i[0])
+        print(str(self.elites))
+
 
     def selection(self, best_count):
         sorted_population = sorted(self.population, key=lambda bird: bird.alive_time + bird.score)
@@ -60,6 +64,15 @@ class Genetic_Algorithm:
             new_population.append(first_3[i])
             new_population.append(second_3[i])
         self.population = new_population
+        for elite in self.elites:
+            elite[1].score = 0
+            elite[1].alive_time = 0
+            self.population.append(elite[1])
+
+        if len(self.population) < self.population_size:
+            for i in range(len(self.population), self.population_size):
+                self.population.append(Bird(100, np.random.randint(20, 500), show_bird=True))
+
 
     def crossover(self, father_bird, mother_bird):
         hidden_weights_father, hidden_bias_father = father_bird.neural_network.get_hidden_weights_and_bias()

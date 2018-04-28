@@ -1,6 +1,6 @@
 import numpy as np
 
-from Neural_Netowrk import NeuralNetwork
+from neural_network import NeuralNetwork
 
 
 class Bird:
@@ -28,7 +28,7 @@ class Bird:
         self.random_no = np.random.randint(30, 50)
         # ----Done
 
-        self.neural_network = NeuralNetwork(input_nodes=2, hidden_nodes=4, output_nodes=1)
+        self.neural_network = NeuralNetwork(input_nodes=3, hidden_nodes=6, output_nodes=1)
 
     def position(self):
         return [self.x, self.y]
@@ -75,7 +75,7 @@ class Bird:
             return True
         return False
 
-    def neural_network_make_decision(self, horizontal_distance, height_difference, simulated=True):
+    def neural_network_make_decision(self, horizontal_distance, height_difference,velocity, simulated=True):
         if simulated:
             if self.f % self.random_no == 0:
                 return True
@@ -84,4 +84,4 @@ class Bird:
         else:
             # print(horizontal_distance, height_difference,
             #       self.neural_network.predict([horizontal_distance, height_difference])[1])
-            return self.neural_network.predict([horizontal_distance, height_difference])[1] > 0.7
+            return self.neural_network.predict([horizontal_distance, height_difference, velocity])[1] > 0.7

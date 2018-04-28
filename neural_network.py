@@ -12,11 +12,25 @@ class NeuralNetwork:
         self.weights_IH = 2.5 * np.random.rand(self.hidden_nodes, self.input_nodes) - 1.25
         self.weights_HO = 2.5 * np.random.rand(self.output_nodes, self.hidden_nodes) - 1.25
 
-        self.bias_H = np.random.rand(self.hidden_nodes, 1)
-        self.bias_O = np.random.rand(self.output_nodes, 1)
+        self.bias_H = 2.5 * np.random.rand(self.hidden_nodes, 1) - 1.25
+        self.bias_O = 2.5 * np.random.rand(self.output_nodes, 1) - 1.25
 
         self.learning_rate = 0.02
 
+
+    def get_hidden_weights_and_bias(self):
+        return self.weights_IH, self.bias_H
+
+    def get_output_weights_and_bias(self):
+        return self.weights_HO, self.bias_O
+
+    def set_hidden_weights_and_bias(self, hidden_weights, hidden_bias):
+        self.weights_IH = hidden_weights
+        self.bias_H = hidden_bias
+
+    def set_output_weights_and_bias(self, output_weights, output_bias):
+        self.weights_HO = output_weights
+        self.bias_O = output_bias
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))

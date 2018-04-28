@@ -92,7 +92,7 @@ def game():
             bird.horizontal_distance = target_point[0] - bird.x
             bird.height_difference = target_point[1] - bird.y
             bird.target_point = target_point
-            if bird.neural_network_make_decision(bird.horizontal_distance, bird.height_difference, simulated=False):
+            if bird.neural_network_make_decision(bird.horizontal_distance, bird.height_difference, bird.velocity,simulated=False):
                 bird.up()
             else:
                 pass
@@ -109,7 +109,7 @@ def game():
         clock.tick(fps)
 
 
-ga = Genetic_Algorithm(population_size=6)  # always keep 6
+ga = Genetic_Algorithm(population_size=20)  # always keep 6
 
 i = 0
 while 1:
