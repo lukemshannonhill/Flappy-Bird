@@ -1,7 +1,5 @@
 import numpy as np
-
 from Bird import Bird
-
 
 class Genetic_Algorithm:
     def __init__(self, population_size):
@@ -10,7 +8,8 @@ class Genetic_Algorithm:
         self.elites = list()
         for i in range(population_size):
             self.population.append(Bird(100, np.random.randint(20, 500), show_bird=True))
-        self.mutation_rate = 10
+        self.mutation_rate = 20
+
 
     def reset_population(self):
         self.population = list()
@@ -24,8 +23,10 @@ class Genetic_Algorithm:
         for bird in self.population:
             print(bird.score)
 
+
     def get_best_unit(self):
         return sorted(self.population, key=lambda bird: bird.alive_time)[-1]
+
 
     def add_to_elites(self):
         best_bird = self.get_best_unit()
@@ -33,7 +34,6 @@ class Genetic_Algorithm:
             if best_bird.alive_time != 0:
                 self.elites.append([best_bird.alive_time, best_bird])
                 print("added to elites, now elites are", len(self.elites))
-
         else:
             if best_bird.alive_time > self.elites[0][1].alive_time:
                 print("added to elites, now elites are", len(self.elites))
@@ -50,6 +50,7 @@ class Genetic_Algorithm:
         self.add_to_elites()
         return sorted_population[len(sorted_population):len(sorted_population) - best_count - 1:-1]
 
+
     def next_generation(self):
         best3 = self.selection(3)
 
@@ -60,10 +61,11 @@ class Genetic_Algorithm:
         new_population = list()
         first_3 = self.crossover(best3[0], best3[1])
         second_3 = self.crossover(best3[1], best3[2])
-        for i in range(len(best3)):
+        for i in range(len(first_3)):
             new_population.append(first_3[i])
             new_population.append(second_3[i])
         self.population = new_population
+
         for elite in self.elites:
             elite[1].score = 0
             elite[1].alive_time = 0
@@ -81,77 +83,36 @@ class Genetic_Algorithm:
         hidden_weights_mother, hidden_bias_mother = mother_bird.neural_network.get_hidden_weights_and_bias()
         output_weights_mother, output_bias_mother = mother_bird.neural_network.get_output_weights_and_bias()
 
-        child_1_hidden = np.random.random(hidden_weights_father.shape)
-        for i in range(child_1_hidden.shape[0]):
-            for j in range(int(child_1_hidden.shape[1] / 2)):
-                child_1_hidden[i][j] = hidden_weights_father[i][j]
-        for i in range(child_1_hidden.shape[0]):
-            for j in range(int(child_1_hidden.shape[1] / 2), child_1_hidden.shape[1]):
-                child_1_hidden[i][j] = hidden_weights_mother[i][j]
-        child_1_output = np.random.random(output_weights_father.shape)
-        for i in range(child_1_output.shape[0]):
-            for j in range(int(child_1_output.shape[1] / 2)):
-                child_1_output[i][j] = output_weights_father[i][j]
-        for i in range(child_1_output.shape[0]):
-            for j in range(int(child_1_output.shape[1] / 2), child_1_output.shape[1]):
-                child_1_output[i][j] = output_weights_mother[i][j]
+        child_1_hidden = hidden_weights_father
+        child_2_hidden = hidden_weights_mother
+        child_1_output = output_weights_mother
+        child_2_output = output_weights_father
 
-        child_2_hidden = np.random.random(hidden_weights_father.shape)
-        for i in range(int(child_2_hidden.shape[0] / 2)):
-            for j in range(child_2_hidden.shape[1]):
-                child_2_hidden[i][j] = hidden_weights_father[i][j]
-        for i in range(int(child_2_hidden.shape[0] / 2), child_2_hidden.shape[0]):
-            for j in range(child_2_hidden.shape[1]):
-                child_2_hidden[i][j] = hidden_weights_mother[i][j]
-        child_2_output = np.random.random(output_weights_father.shape)
-        for i in range(int(child_2_output.shape[0] / 2)):
-            for j in range(child_2_output.shape[1]):
-                child_2_output[i][j] = output_weights_father[i][j]
-        for i in range(int(child_2_output.shape[0] / 2), child_2_output.shape[0]):
-            for j in range(child_2_output.shape[1]):
-                child_2_output[i][j] = output_weights_mother[i][j]
-
-        child_3_hidden = np.random.random(hidden_weights_father.shape)
-        for i in range(child_3_hidden.shape[0]):
-            for j in range(child_3_hidden.shape[1]):
-                child_3_hidden[i][j] = hidden_weights_father[i][j] if np.random.randint(0, 100) > 50 else \
-                    hidden_weights_mother[i][j]
-        child_3_output = np.random.random(output_weights_father.shape)
-        for i in range(child_3_output.shape[0]):
-            for j in range(child_3_output.shape[1]):
-                child_3_output[i][j] = output_weights_father[i][j] if np.random.randint(0, 100) > 50 else \
-                    output_weights_mother[i][j]
+        hidden_bias_child1 = hidden_bias_father
+        hidden_bias_child2 = hidden_bias_mother
+        output_bias_child2 = output_bias_father
+        output_bias_child1 = output_bias_mother
 
         child_1_hidden = self.mutate(child_1_hidden)
         child_2_hidden = self.mutate(child_2_hidden)
-        child_3_hidden = self.mutate(child_3_hidden)
         child_1_output = self.mutate(child_1_output)
         child_2_output = self.mutate(child_2_output)
-        child_3_output = self.mutate(child_3_output)
 
         child_1 = Bird(100, np.random.randint(20, 500), show_bird=True)
         child_2 = Bird(100, np.random.randint(20, 500), show_bird=True)
-        child_3 = Bird(100, np.random.randint(20, 500), show_bird=True)
 
         child_1.neural_network.set_hidden_weights_and_bias(child_1_hidden,
-                                                           father_bird.neural_network.get_hidden_weights_and_bias()[1])
+                                                           hidden_bias_child1)
         child_1.neural_network.set_output_weights_and_bias(child_1_output,
-                                                           father_bird.neural_network.get_output_weights_and_bias()[1])
+                                                           output_bias_child1)
 
         child_2.neural_network.set_hidden_weights_and_bias(child_2_hidden,
-                                                           father_bird.neural_network.get_hidden_weights_and_bias()[1])
+                                                           hidden_bias_child2)
         child_2.neural_network.set_output_weights_and_bias(child_2_output,
-                                                           father_bird.neural_network.get_output_weights_and_bias()[1])
+                                                           output_bias_child2)
 
-        child_3.neural_network.set_hidden_weights_and_bias(child_3_hidden,
-                                                           father_bird.neural_network.get_hidden_weights_and_bias()[1])
-        child_3.neural_network.set_output_weights_and_bias(child_3_output,
-                                                           father_bird.neural_network.get_output_weights_and_bias()[1])
-        # print(child_1)
-        # print(child_2)
-        # print(child_3)
+        return child_1, child_2
 
-        return child_1, child_2, child_3
 
     def mutate(self, child):
         for i in range(child.shape[0]):
