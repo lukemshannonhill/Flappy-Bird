@@ -15,6 +15,10 @@ pipe_color = (117, 194, 26)
 height = 600
 width = 400
 
+bird_image = pygame.image.load('bird.png')
+bird_image = pygame.transform.scale(bird_image, (30, 30))
+
+
 pygame.init()
 pygame = pygame
 size = width, height
@@ -120,7 +124,7 @@ def game():
         clock.tick(fps)
 
 
-ga = Genetic_Algorithm(population_size=20)  # always keep 6
+ga = Genetic_Algorithm(population_size=50)  # always keep 6
 
 i = 0
 while 1:

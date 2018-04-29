@@ -51,20 +51,21 @@ class Bird:
 
     def show(self):
         if self.show_bird:
-            from FlappyBird import pygame, white, screen, red_blue
-            pygame.draw.circle(screen, red_blue, self.position(), self.radius)
-            pygame.draw.line(screen, white, (self.x, self.y + self.height_difference), (self.x, self.y))
-            pygame.draw.line(screen, white,
-                             (self.x, self.y),
-                             (self.horizontal_distance + self.x, self.y))
-            screen.blit(
-                pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
-                    "{}".format(self.height_difference), True, white),
-                (self.x + 15, self.y - 100 if self.y - 100 > 0 else 0))
-            screen.blit(
-                pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
-                    "{}".format(self.horizontal_distance), True, white),
-                (self.x + 50, self.y - 30 if self.y - 30 > 0 else 0))
+            from FlappyBird import pygame, white, screen, red_blue, bird_image
+            screen.blit(bird_image, [self.position()[0]-15, self.position()[1]-15])
+            # pygame.draw.circle(screen, red_blue, self.position(), self.radius)
+            # pygame.draw.line(screen, white, (self.x, self.y + self.height_difference), (self.x, self.y))
+            # pygame.draw.line(screen, white,
+            #                  (self.x, self.y),
+            #                  (self.horizontal_distance + self.x, self.y))
+            # screen.blit(
+            #     pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+            #         "{}".format(self.height_difference), True, white),
+            #     (self.x + 15, self.y - 100 if self.y - 100 > 0 else 0))
+            # screen.blit(
+            #     pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+            #         "{}".format(self.horizontal_distance), True, white),
+            #     (self.x + 50, self.y - 30 if self.y - 30 > 0 else 0))
 
     def up(self):
         self.velocity += self.lift
