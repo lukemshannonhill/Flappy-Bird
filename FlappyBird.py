@@ -10,6 +10,7 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 red_blue = (255, 0, 255)
+pipe_color = (117, 194, 26)
 
 height = 600
 width = 400
@@ -25,14 +26,24 @@ fps = 60
 pipe_interval = int(1000 * 60 / fps)
 
 
+class Background(pygame.sprite.Sprite):
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
+        self.image = pygame.image.load(image_file)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
 def game():
     birds = ga.get_population()
     pipe_level = 1
     pipes = []
     done = False
     pygame.time.set_timer(USEREVENT + 1, pipe_interval)
+    BackGround = Background('large.jpg', [0, 0])
     while not done:
-        screen.fill(black)
+        screen.fill([255, 255, 255])
+        screen.blit(BackGround.image, BackGround.rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
