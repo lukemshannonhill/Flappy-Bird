@@ -89,5 +89,4 @@ class Bird:
         else:
             # print(horizontal_distance, height_difference,
             #       self.neural_network.predict([horizontal_distance, height_difference])[1])
-
-        return self.neural_network.predict([horizontal_distance, height_difference, velocity])[1] > 0.5
+            return self.neural_network.predict([horizontal_distance, height_difference, velocity])[1] > 0.5
