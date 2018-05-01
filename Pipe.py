@@ -19,7 +19,7 @@ class Pipe:
 
         pygame.draw.rect(screen, pipe_color if not self.has_hit else red, [self.x, 0, self.w, self.top])
         pygame.draw.rect(screen, pipe_color if not self.has_hit else red,
-                         [self.x, height - self.bottom, self.w, self.bottom])
+                         [self.x, height - self.bottom-23, self.w, self.bottom-23])
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 25).render(
                 "{}".format(self.distance_from_bird_to_end_of_gap), True, green),

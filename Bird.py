@@ -5,11 +5,14 @@ from neural_network import NeuralNetwork
 
 class Bird:
     def __init__(self, x, y, genome=None, show_bird=False):
-        from FlappyBird import width, height
+        from FlappyBird import pygame, width, height
         self.x = x
         self.show_bird = show_bird
         self.y = y
         self.radius = 15
+
+        bird_image = pygame.image.load('bird.png')
+        self.bird_image = pygame.transform.scale(bird_image, (self.radius*2, self.radius*2))
 
         self.gravity = 0.8
         self.velocity = 0
@@ -55,8 +58,8 @@ class Bird:
 
     def show(self):
         if self.show_bird:
-            from FlappyBird import pygame, white, screen, red_blue, bird_image
-            screen.blit(bird_image, [self.position()[0]-15, self.position()[1]-15])
+            from FlappyBird import white, screen, red_blue
+            screen.blit(self.bird_image, [self.position()[0]-self.radius, self.position()[1]-self.radius])
             # pygame.draw.circle(screen, red_blue, self.position(), self.radius)
             # pygame.draw.line(screen, white, (self.x, self.y + self.height_difference), (self.x, self.y))
             # pygame.draw.line(screen, white,
@@ -87,6 +90,9 @@ class Bird:
             else:
                 return False
         else:
-            # print(horizontal_distance, height_difference,
-            #       self.neural_network.predict([horizontal_distance, height_difference])[1])
+            #Normalize the input values
+            # from FlappyBird import height, width
+            # horizontal_distance = horizontal_distance/width
+            # height_difference = height_difference/height
+            # velocity = velocity/10
             return self.neural_network.predict([horizontal_distance, height_difference, velocity])[1] > 0.5

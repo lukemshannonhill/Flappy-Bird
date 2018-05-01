@@ -53,7 +53,6 @@ class NeuralNetwork:
 
         # Generate the output
         output_matrix = np.matmul(self.weights_HO, hidden_matrix)+ self.bias_O
-
         #Activation function
         output_matrix = self.sigmoid(output_matrix)
         return hidden_matrix, output_matrix

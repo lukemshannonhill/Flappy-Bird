@@ -15,9 +15,6 @@ pipe_color = (117, 194, 26)
 height = 600
 width = 400
 
-bird_image = pygame.image.load('bird.png')
-bird_image = pygame.transform.scale(bird_image, (30, 30))
-
 
 pygame.init()
 pygame = pygame
@@ -38,7 +35,7 @@ class Background(pygame.sprite.Sprite):
         self.rect.left, self.rect.top = location
 
 
-def game():
+def game(generation, high_score):
     birds = ga.get_population()
 
     # for bird in birds:
@@ -103,6 +100,16 @@ def game():
         pygame.draw.line(screen, blue, [0, target_point[1]], [width, target_point[1]])
         pygame.draw.line(screen, blue, [target_point[0], 0], [target_point[0], height])
 
+        screen.blit(
+            pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+                "Generation:{}".format(generation), True, blue),
+            (10, 570))
+
+        screen.blit(
+            pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+                "High Score:{}".format(high_score), True, blue),
+            (150, 570))
+
         for bird in birds:
             if bird.hit_walls():
                 birds.remove(bird)
@@ -128,14 +135,17 @@ def game():
         clock.tick(fps)
 
 
-ga = Genetic_Algorithm(population_size=50)
+ga = Genetic_Algorithm(population_size=20)
 
-i = 0
+generation = 0
+high_score = 0
 while 1:
-    i += 1
-    print("New game", i)
-    game()
-    print("Best bird", ga.get_best_unit().score, "\n")
+    generation += 1
+    print("New game, Generation:", generation)
+    game(generation, high_score)
+    score = ga.get_best_unit().score
+    print("Best bird", score, "\n")
+    if score>high_score: high_score = score
     ga.next_generation()
 # game()
 

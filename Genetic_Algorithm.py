@@ -59,17 +59,23 @@ class Genetic_Algorithm:
             self.reset_population()
 
         new_population = list()
-        first_3 = self.crossover(best3[0], best3[1])
-        second_3 = self.crossover(best3[1], best3[2])
-        for i in range(len(first_3)):
-            new_population.append(first_3[i])
-            new_population.append(second_3[i])
+        child_population = list()
+        child_population.append(self.crossover(best3[0], best3[1]))
+        child_population.append(self.crossover(best3[1], best3[2]))
+        if len(self.elites) > 1:
+            for i in range(len(self.elites)-1,0,-1):
+                child_population.append(self.crossover(self.elites[i][1], self.elites[i-1][1]))
+
+        for child in child_population:
+            for i in range(len(child)):
+                new_population.append(child[i])
         self.population = new_population
 
         for elite in self.elites:
-            elite[1].score = 0
-            elite[1].alive_time = 0
-            self.population.append(elite[1])
+            if len(self.population) < self.population_size:
+                elite[1].score = 0
+                elite[1].alive_time = 0
+                self.population.append(elite[1])
 
         if len(self.population) < self.population_size:
             for i in range(len(self.population), self.population_size):
