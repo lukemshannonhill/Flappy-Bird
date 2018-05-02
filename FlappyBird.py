@@ -135,7 +135,7 @@ def game(generation, high_score):
         clock.tick(fps)
 
 
-ga = Genetic_Algorithm(population_size=20)
+ga = Genetic_Algorithm(population_size=50)
 
 generation = 0
 high_score = 0
