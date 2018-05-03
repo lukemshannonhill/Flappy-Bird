@@ -30,7 +30,7 @@ class Genetic_Algorithm:
 
     def add_to_elites(self):
         best_bird = self.get_best_unit()
-        if len(self.elites) < 6:
+        if len(self.elites) < 10:
             if best_bird.alive_time != 0:
                 self.elites.append([best_bird.alive_time, best_bird])
                 print("added to elites, now elites are", len(self.elites))

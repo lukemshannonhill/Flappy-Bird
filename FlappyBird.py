@@ -27,6 +27,7 @@ fps = 60
 pipe_interval = int(1000 * 60 / fps)
 
 
+
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
@@ -100,6 +101,10 @@ def game(generation, high_score):
         pygame.draw.line(screen, blue, [0, target_point[1]], [width, target_point[1]])
         pygame.draw.line(screen, blue, [target_point[0], 0], [target_point[0], height])
 
+        curr_score = ga.get_best_unit().score
+        if curr_score > high_score:
+            high_score = curr_score
+
         screen.blit(
             pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
                 "Generation:{}".format(generation), True, blue),
@@ -110,6 +115,11 @@ def game(generation, high_score):
                 "High Score:{}".format(high_score), True, blue),
             (150, 570))
 
+        screen.blit(
+            pygame.font.Font('C://windows//fonts//arial.ttf', 20).render(
+                "alive:{}".format(len(birds)), True, blue),
+            (300, 570))
+
         for bird in birds:
             if bird.hit_walls():
                 birds.remove(bird)
@@ -118,7 +128,12 @@ def game(generation, high_score):
             bird.horizontal_distance = target_point[0] - bird.x
             bird.height_difference = target_point[1] - bird.y
             bird.target_point = target_point
-            if bird.neural_network_make_decision(bird.horizontal_distance, bird.height_difference, bird.velocity,simulated=False):
+            if(generation<3):
+                sim=True
+            else:
+                sim=False
+
+            if bird.neural_network_make_decision(bird.horizontal_distance, bird.height_difference, bird.velocity,simulated=sim):
                 bird.up()
             else:
                 pass
